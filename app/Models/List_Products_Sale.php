@@ -2,13 +2,10 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class List_Products_Sale extends Model
 {
-    use HasFactory;
-
     protected $table = 'list_products_sale';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'update_at';
