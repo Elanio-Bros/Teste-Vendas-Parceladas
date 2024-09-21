@@ -16,7 +16,8 @@ class DatabaseSeeder extends Seeder
     {
         Admins::create(['name' => 'master', 'email' => 'admin@email.com.br', 'password' => 'adm!n@123']);
         $name = fake()->name();
-        Clients::create(['name' => $name, 'email' => "$name@email.com.br", 'type_document' => 'cpf', 'document' => '000.000.000-00']);
-        Products::create(['name' => 'Camisa Polo M', 'stock_quantity' => rand(1, 50), 'unity_price' => rand(200, 900)/10]);
+        $email = str_replace(" ", "", strtolower($name));
+        Clients::create(['name' => $name, 'email' => "$email@email.com.br", 'type_document' => 'cpf', 'document' => '000.000.000-00']);
+        Products::create(['name' => 'Camisa Polo M', 'stock_quantity' => rand(1, 50), 'unity_price' => rand(200, 900) / 10]);
     }
 }

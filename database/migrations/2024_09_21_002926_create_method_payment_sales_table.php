@@ -19,6 +19,8 @@ return new class extends Migration
             $table->decimal('value', places: 2);
             $table->datetime('date_payment');
             $table->timestamps();
+
+            $table->foreign('sale_id')->references('id')->on('sales')->onDelete('restrict')->onUpdate('cascade');
         });
     }
 

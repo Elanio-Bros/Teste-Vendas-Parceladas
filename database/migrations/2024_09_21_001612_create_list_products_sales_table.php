@@ -19,7 +19,7 @@ return new class extends Migration
             $table->decimal('total',places:2);
             $table->timestamps();
 
-            $table->foreign('product_id')->references('id')->on('products');
+            $table->foreign('product_id')->references('id')->on('products')->onDelete('restrict')->onUpdate('cascade');
         });
     }
 

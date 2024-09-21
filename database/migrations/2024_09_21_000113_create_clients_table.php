@@ -13,10 +13,10 @@ return new class extends Migration
     {
         Schema::create('clients', function (Blueprint $table) {
             $table->id();
-            $table->string('name');
-            $table->string('email')->unique();
+            $table->text('name');
+            $table->string('email', 500)->unique();
             $table->enum('type_document', ['cpf', 'cnpj', 'rg']);
-            $table->string('document')->unique();
+            $table->string('document',18)->unique();
             $table->timestamps();
         });
     }
