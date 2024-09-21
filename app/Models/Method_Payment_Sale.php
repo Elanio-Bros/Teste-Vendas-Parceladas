@@ -8,7 +8,7 @@ class Method_Payment_Sale extends Model
 {
     protected $table = 'method_payment_ssale';
     const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'update_at';
+    const UPDATED_AT = 'updated_at';
 
     /**
      * The attributes that are mass assignable.

@@ -12,7 +12,7 @@ class Admins extends Authenticatable
 
     protected $table = 'admins';
     const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'update_at';
+    const UPDATED_AT = 'updated_at';
 
     /**
      * The attributes that are mass assignable.

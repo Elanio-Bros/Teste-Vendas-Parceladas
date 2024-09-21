@@ -8,7 +8,7 @@ class Sales extends Model
 {
     protected $table = 'sales';
     const CREATED_AT = 'created_at';
-    const UPDATED_AT = 'update_at';
+    const UPDATED_AT = 'updated_at';
 
     /**
      * The attributes that are mass assignable.
