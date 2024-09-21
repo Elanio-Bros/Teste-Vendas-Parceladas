@@ -3,20 +3,20 @@
 namespace Database\Seeders;
 
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
+
+use App\Models\Admins;
+use App\Models\Clients;
+use App\Models\Products;
 use Illuminate\Database\Seeder;
+use Illuminate\Support\Testing\Fakes;
 
 class DatabaseSeeder extends Seeder
 {
-    /**
-     * Seed the application's database.
-     */
     public function run(): void
     {
-        // \App\Models\User::factory(10)->create();
-
-        // \App\Models\User::factory()->create([
-        //     'name' => 'Test User',
-        //     'email' => 'test@example.com',
-        // ]);
+        Admins::create(['name' => 'master', 'email' => 'admin@email.com.br', 'password' => 'adm!n@123']);
+        $name = fake()->name();
+        Clients::create(['name' => $name, 'email' => "$name@email.com.br", 'type_document' => 'cpf', 'document' => '000.000.000-00']);
+        Products::create(['name' => 'Camisa Polo M', 'stock_quantity' => rand(1, 50), 'unity_price' => rand(200, 900)/10]);
     }
 }
