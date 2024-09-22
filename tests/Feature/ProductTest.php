@@ -17,6 +17,8 @@ class ProductTest extends TestCase
 
     public function test_update(): void
     {
+        Products::factory()->create();
+
         $product = Products::first();
 
         $response = $this->post("/produtos/produto/{$product['id']}/editar", ['name' => 'Camisa Polo M', 'unity_price' => number_format((rand(200, 900) / 10), 2, thousands_separator: "")]);
@@ -26,6 +28,8 @@ class ProductTest extends TestCase
 
     public function test_delete(): void
     {
+        Products::factory()->create();
+
         $product = Products::first();
 
         $response = $this->post("/produtos/produto/{$product['id']}/apagar");

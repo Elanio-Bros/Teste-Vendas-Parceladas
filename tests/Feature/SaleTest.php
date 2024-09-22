@@ -17,12 +17,10 @@ class SaleTest extends TestCase
             Clients::factory()->create();
         }
 
-        if (Clients::count() == 0) {
+        if (Products::count() == 0) {
             Products::factory()->create();
         }
-
-
-
+        
         $client = Clients::first();
         $product = Products::first();
         $quantity = rand(1, $product['stock_quantity']);

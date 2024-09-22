@@ -21,6 +21,8 @@ class ClientTest extends TestCase
 
     public function test_update(): void
     {
+        Clients::factory()->create();
+
         $client = Clients::first();
         $name = fake()->name();
         $email = str_replace(" ", "_", strtolower($name));
@@ -30,8 +32,8 @@ class ClientTest extends TestCase
 
     public function test_delete(): void
     {
+        Clients::factory()->create();
         $client = Clients::first();
-
         $response = $this->post("/clientes/cliente/{$client['id']}/apagar");
         $response->assertStatus(200)->assertJson(['message' => 'client deleted']);
     }
