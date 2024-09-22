@@ -13,6 +13,9 @@ class SaleTest extends TestCase
 {
     public function test_create(): void
     {
+        Clients::factory()->create();
+        Products::factory()->create();
+
         $client = Clients::first();
         $product = Products::first();
         $quantity = rand(1, $product['stock_quantity']);
@@ -69,7 +72,7 @@ class SaleTest extends TestCase
         $sale = Sales::first();
         $list = List_Products_Sales::where('sale_id', '=', $sale['id'])->first();
 
-        $response = $this->post("/vendas/venda/{$sale['id']}/editar", ['total_price'=>number_format($list['total'], 2, thousands_separator: "")]);
+        $response = $this->post("/vendas/venda/{$sale['id']}/editar", ['total_price' => number_format($list['total'], 2, thousands_separator: "")]);
 
         $response->assertStatus(200)->assertJson(['message' => 'sale changed']);
     }

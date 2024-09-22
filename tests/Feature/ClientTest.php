@@ -2,16 +2,20 @@
 
 namespace Tests\Feature;
 
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 use App\Models\Clients;
 use Tests\TestCase;
 
 class ClientTest extends TestCase
 {
+    use DatabaseTransactions;
+    
     public function test_create(): void
     {
         $name = fake()->name();
         $email = str_replace(" ", "_", strtolower($name));
-        $response = $this->post('/clientes/cliente/adicionar', ['name' => $name, 'email' => "$email@email.com.br", 'type_document' => 'cpf', 'document' => '000.000.000-01']);
+        $code = rand(10, 99);
+        $response = $this->post('/clientes/cliente/adicionar', ['name' => $name, 'email' => "$email@email.com.br", 'type_document' => 'cpf', 'document' => "000.000.000-{$code}"]);
         $response->assertStatus(201)->assertJson(['message' => 'client created']);
     }
 

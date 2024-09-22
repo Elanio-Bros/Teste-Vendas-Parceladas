@@ -4,9 +4,11 @@ namespace Tests\Feature;
 
 use App\Models\Products;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\DatabaseTransactions;
 
 class ProductTest extends TestCase
 {
+    use DatabaseTransactions;
     public function test_create(): void
     {
         $response = $this->post('/produtos/produto/adicionar', ['name' => 'Camisa Polo', 'stock_quantity' => rand(1, 50), 'unity_price' => number_format((rand(200, 900) / 10), 2, thousands_separator: "")]);
