@@ -7,9 +7,6 @@ use Tests\TestCase;
 
 class ClientTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
     public function test_create(): void
     {
         $name = fake()->name();

@@ -7,9 +7,6 @@ use Tests\TestCase;
 
 class ProductTest extends TestCase
 {
-    /**
-     * A basic feature test example.
-     */
     public function test_create(): void
     {
         $response = $this->post('/produtos/produto/adicionar', ['name' => 'Camisa Polo', 'stock_quantity' => rand(1, 50), 'unity_price' => number_format((rand(200, 900) / 10), 2, thousands_separator: "")]);

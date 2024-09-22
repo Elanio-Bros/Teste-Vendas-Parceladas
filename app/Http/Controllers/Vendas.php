@@ -120,7 +120,7 @@ class Vendas extends Controller
         $validate = $this->validate($request, [
             'sale_id' => 'integer|exists:sales,id',
             'payment' => 'array|required',
-            'payment.*.paid' => 'boolean|required',
+            'payment.*.paid' => 'boolean',
             'payment.*.type_payment' => 'in:credit,cash|required',
             'payment.*.value' => 'decimal:2|required',
             'payment.*.date_payment' => 'date|required',
@@ -146,7 +146,7 @@ class Vendas extends Controller
         $sale = Sales::with('salesman', 'client', 'list_products', 'payment_method')->where('id', '=', $id)->first();
 
         if ($sale !== null) {
-            return response()->json(compact('sale'));
+            return response()->json(compact('sale'), 200);
         } else {
             return response()->json(['erro' => 'sale', 'message' => 'sale not found'], 404);
         }
@@ -173,7 +173,7 @@ class Vendas extends Controller
         }
     }
 
-    public function update_product_list(Request $request, int $id): JsonResponse
+    public function update_product_list(Request $request, int $id, int $list_id): JsonResponse
     {
         $validate = $this->validate($request, [
             'product_id' => 'integer|exists:products,id',
@@ -182,7 +182,7 @@ class Vendas extends Controller
             'total' => 'decimal:2',
         ]);
 
-        $product = List_Products_Sales::where('id', '=', $id)->first();
+        $product = List_Products_Sales::where([['id', '=', $list_id], ['sale_id', '=', $id]])->first();
 
         if ($product !== null) {
             if (count($validate) >= 1) {
@@ -196,16 +196,16 @@ class Vendas extends Controller
         }
     }
 
-    public function update_payment(Request $request, int $id): JsonResponse
+    public function update_payment(Request $request, int $id, int $payment_id): JsonResponse
     {
         $validate = $this->validate($request, [
-            'paid' => 'boolean|required',
-            'type_payment' => 'in:credit,cash|required',
-            'value' => 'decimal:2|required',
-            'date_payment' => 'date|required',
+            'paid' => 'boolean',
+            'type_payment' => 'in:credit,cash',
+            'value' => 'decimal:2',
+            'date_payment' => 'date',
         ]);
 
-        $product = Method_Payment_Sales::where('id', '=', $id)->first();
+        $product = Method_Payment_Sales::where([['id', '=', $payment_id], ['sale_id', '=', $id]])->first();
 
         if ($product !== null) {
             if (count($validate) >= 1) {

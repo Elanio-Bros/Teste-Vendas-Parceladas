@@ -47,6 +47,7 @@ Route::group(['prefix' => 'vendas'], function () {
         Route::get('/{id}', [App\Http\Controllers\Vendas::class, 'sale']);
         Route::post('/{id}/editar', [App\Http\Controllers\Vendas::class, 'update']);
         Route::post('/{id}/apagar', [App\Http\Controllers\Vendas::class, 'delete']);
-        Route::post('/{id}/produto/{product_id}', [App\Http\Controllers\Vendas::class, 'update_product_list']);
+        Route::post('/{id}/produto/{list_id}', [App\Http\Controllers\Vendas::class, 'update_product_list']);
+        Route::post('/{id}/pagamento/{payment_id}', [App\Http\Controllers\Vendas::class, 'update_payment']);
     });
 });
