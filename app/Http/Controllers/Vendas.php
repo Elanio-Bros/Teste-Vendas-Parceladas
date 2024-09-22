@@ -205,11 +205,11 @@ class Vendas extends Controller
             'date_payment' => 'date',
         ]);
 
-        $product = Method_Payment_Sales::where([['id', '=', $payment_id], ['sale_id', '=', $id]])->first();
+        $payment = Method_Payment_Sales::where([['id', '=', $payment_id], ['sale_id', '=', $id]])->first();
 
-        if ($product !== null) {
+        if ($payment !== null) {
             if (count($validate) >= 1) {
-                $product->update($validate);
+                $payment->update($validate);
                 return response()->json(['message' => 'payment changed'], 200);
             } else {
                 return response()->json(['message' => 'payment not changed'], 304);
@@ -229,6 +229,29 @@ class Vendas extends Controller
             return response()->json(['message' => 'sale deleted'], 200);
         } else {
             return response()->json(['erro' => 'sale', 'message' => 'sale not found'], 404);
+        }
+    }
+
+    public function delete_product_list(int $id, int $list_id): JsonResponse
+    {
+        $product = List_Products_Sales::where([['id', '=', $list_id], ['sale_id', '=', $id]])->first();
+        if ($product !== null) {
+            $product->delete();
+            return response()->json(['message' => 'product deleted'], 200);
+        } else {
+            return response()->json(['erro' => 'sale', 'message' => 'product not found'], 404);
+        }
+    }
+
+    public function delete_payment(int $id, int $payment_id): JsonResponse
+    {
+        $payment = Method_Payment_Sales::where([['paid', '=', 0], ['id', '=', $payment_id], ['sale_id', '=', $id]])->first();
+
+        if ($payment !== null) {
+            $payment->delete();
+            return response()->json(['message' => 'payment deleted'], 200);
+        } else {
+            return response()->json(['erro' => 'sale', 'message' => 'payment not found'], 404);
         }
     }
 }

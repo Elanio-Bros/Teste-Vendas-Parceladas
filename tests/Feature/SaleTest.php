@@ -13,8 +13,15 @@ class SaleTest extends TestCase
 {
     public function test_create(): void
     {
-        Clients::factory()->create();
-        Products::factory()->create();
+        if (Clients::count() == 0) {
+            Clients::factory()->create();
+        }
+
+        if (Clients::count() == 0) {
+            Products::factory()->create();
+        }
+
+
 
         $client = Clients::first();
         $product = Products::first();
@@ -32,8 +39,12 @@ class SaleTest extends TestCase
             ]],
             'payment' => [[
                 'type_payment' => 'cash',
-                'value' => $total,
+                'value' => number_format($total / 2, 2, thousands_separator: ""),
                 'date_payment' => date('Y-m-d H:i:s')
+            ], [
+                'type_payment' => 'cash',
+                'value' => number_format($total / 2, 2, thousands_separator: ""),
+                'date_payment' => date('Y-m-d H:i:s', strtotime('+30 days'))
             ]],
         ]);
 
@@ -75,6 +86,31 @@ class SaleTest extends TestCase
         $response = $this->post("/vendas/venda/{$sale['id']}/editar", ['total_price' => number_format($list['total'], 2, thousands_separator: "")]);
 
         $response->assertStatus(200)->assertJson(['message' => 'sale changed']);
+    }
+
+    public function test_delete_product(): void
+    {
+        $sale = Sales::first();
+        $list = List_Products_Sales::where('sale_id', '=', $sale['id'])->first();
+
+        $response = $this->post("/vendas/venda/{$sale['id']}/produto/{$list['id']}/apagar");
+        $response->assertStatus(200)->assertJson(['message' => 'product deleted']);
+    }
+
+    public function test_delete_payment(): void
+    {
+        $sale = Sales::first();
+        $payment = Method_Payment_Sales::where([['sale_id', '=', $sale['id']], ['paid', '=', false]])->first();
+        $response = $this->post("/vendas/venda/{$sale['id']}/pagamento/{$payment['id']}/apagar");
+        $response->assertStatus(200)->assertJson(['message' => 'payment deleted']);
+    }
+
+    public function test_delete_payment_erro(): void
+    {
+        $sale = Sales::first();
+        $payment = Method_Payment_Sales::where([['sale_id', '=', $sale['id']], ['paid', '=', true]])->first();
+        $response = $this->post("/vendas/venda/{$sale['id']}/pagamento/{$payment['id']}/apagar");
+        $response->assertStatus(404)->assertJson(['erro' => 'sale', 'message' => 'payment not found']);
     }
 
     public function test_delete(): void

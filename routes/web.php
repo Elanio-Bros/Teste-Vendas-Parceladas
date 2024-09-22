@@ -48,6 +48,8 @@ Route::group(['prefix' => 'vendas'], function () {
         Route::post('/{id}/editar', [App\Http\Controllers\Vendas::class, 'update']);
         Route::post('/{id}/apagar', [App\Http\Controllers\Vendas::class, 'delete']);
         Route::post('/{id}/produto/{list_id}', [App\Http\Controllers\Vendas::class, 'update_product_list']);
+        Route::post('/{id}/produto/{list_id}/apagar', [App\Http\Controllers\Vendas::class, 'delete_product_list']);
         Route::post('/{id}/pagamento/{payment_id}', [App\Http\Controllers\Vendas::class, 'update_payment']);
+        Route::post('/{id}/pagamento/{payment_id}/apagar', [App\Http\Controllers\Vendas::class, 'delete_payment']);
     });
 });
