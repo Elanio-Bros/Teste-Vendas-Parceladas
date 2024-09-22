@@ -15,13 +15,11 @@ return new class extends Migration
             $table->id();
             $table->foreignId('salesman_id')->comment('salesman_id is equal admin_id');
             $table->foreignId('client_id');
-            $table->foreignId('list_products_id');
             $table->decimal('total_price', places: 2);
             $table->timestamps();
             
             $table->foreign('salesman_id')->references('id')->on('admins')->onDelete('restrict')->onUpdate('cascade');
             $table->foreign('client_id')->references('id')->on('clients')->onDelete('restrict')->onUpdate('cascade');
-            $table->foreign('list_products_id')->references('id')->on('list_products_sales')->onDelete('restrict')->onUpdate('cascade');
         });
     }
 

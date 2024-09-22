@@ -4,9 +4,9 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Method_Payment_Sale extends Model
+class Method_Payment_Sales extends Model
 {
-    protected $table = 'method_payment_ssale';
+    protected $table = 'method_payment_sales';
     const CREATED_AT = 'created_at';
     const UPDATED_AT = 'updated_at';
 
@@ -18,6 +18,7 @@ class Method_Payment_Sale extends Model
     protected $fillable = [
         'sale_id',
         'paid',
+        'type_payment',
         'value',
         'date_payment',
     ];
