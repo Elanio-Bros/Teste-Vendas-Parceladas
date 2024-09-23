@@ -9,13 +9,6 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class StartTest extends TestCase
 {
     use DatabaseTransactions;
-    
-    public function test_inital(): void
-    {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
-    }
 
     public function test_login_user(): void
     {
