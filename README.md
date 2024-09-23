@@ -1,66 +1,61 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# Aplicação Vendas (Sem Front)
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+## Resume
+Aplicação consiste em um sistema de vendas basico podendo ter alteração da da informações da venda, existindo um rebalanceador de valores nos metodos de pagamento.
 
-## About Laravel
+O sistema já vem com um admin pré-registrado:
+> User: master <br/>
+> Email: admin@email.com.br <br/>
+> Password: adm!n@123 <br/>
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+### Necessário
+ - [PHP 8.0](https://www.php.net/)
+ - [Composer](https://getcomposer.org/)
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+### Importante
+Antes de ativar o projeto, você deve primeiro configurar o arquivo **.env**. Este arquivo é extremamente importante para o projeto porque contém as principais configurações do sistema. O arquivo [.env.example](./.env.example) servirá como base para o nosso sistema. As variáveis ​​a serem configuradas neste arquivo são
+ 
+<details>
+<summary>Configurações .env</summary>
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+### Database
+`DB_HOST`-> host de banco de dados<br>
+`DB_DATABASE`->O banco de dados principal<br>
+`DB_PORT`->Porta usada no sistema de banco de dados<br>
+`DB_USERNAME`->usuário do banco de dados<br>
+`DB_PASSWORD`->senha do banco de dados<br>
 
-## Learning Laravel
+</details>
+<br>
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+Após fazer as configurações apropriadas no arquivo **.env**, execute alguns comandos de terminal dentro do repositório:
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+1. Instale todas as dependências do projeto com o composer:
+```bash
+composer install
+```
+2. Gerar chave de criptografia do aplicativo:
+```bash
+php artisan key:generate
+```
+3. Crie bancos de dados e segmentos iniciais
+```bash
+php artisan migrate --seed
+```
+4. Iniciar um servidor local
+```bash
+php artisan serve
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+## Finished
+Se você quiser usá-lo em um servidor independente, você deve redirecionar para [/public/index.php](public/index.php) para que o aplicativo funcione corretamente.
 
-## Laravel Sponsors
+Se desejar, execute os testes para analisar se as rotas na aplicação estão em ordem:
+```bash
+php artisan test
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
-
-### Premium Partners
-
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
-
-## Contributing
-
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
-
-## Code of Conduct
-
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
-
-## Security Vulnerabilities
-
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
-
-## License
-
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+Se você quiser usar um produto para testes, use o comando:
+```bash
+php artisan db:seed
+```
