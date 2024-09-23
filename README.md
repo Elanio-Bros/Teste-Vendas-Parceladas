@@ -54,8 +54,3 @@ Se desejar, execute os testes para analisar se as rotas na aplicação estão em
 ```bash
 php artisan test
 ```
-
-Se você quiser usar um produto para testes, use o comando:
-```bash
-php artisan db:seed
-```
