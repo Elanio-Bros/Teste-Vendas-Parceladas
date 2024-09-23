@@ -257,8 +257,8 @@ class Vendas extends Controller
         if ($product !== null) {
             $product->delete();
 
-            $this->rebalancing_parcels($id);
             $sum_products = List_Products_Sales::selectRaw('SUM(total) as total')->where([['sale_id', '=', $id]])->get()['total'] ?? 0;
+            $this->rebalancing_parcels($id);
             Sales::where('id', '=', $id)->first()->update(['total_price' => $sum_products]);
 
             return response()->json(['message' => 'product deleted'], 200);
@@ -284,14 +284,17 @@ class Vendas extends Controller
         }
     }
 
-    private function rebalancing_parcels(int $sale_id)
+    private function rebalancing_parcels(int $sale_id): void
     {
         $sale = Sales::where('id', '=', $sale_id)->first();
 
-        // Pegar os não pagos e a soma dos pagos
+        // Pegar total de produtos, os não pagos e a soma dos pagos
+        $sum_products = List_Products_Sales::selectRaw('SUM(total) as total')->where([['sale_id', '=', $sale_id]])->get()['total'] ?? 0;
         $not_paid_list = Method_Payment_Sales::select('id', 'value')->where([['sale_id', '=', $sale_id], ['paid', '=', 0]])->get()->toArray();
         $sum_paid = Method_Payment_Sales::selectRaw('SUM(value) as value')->where([['sale_id', '=', $sale_id], ['paid', '=', 1]])->first()['value'] ?? 0;
-        $total_sale = $sale['total_price'] - $sum_paid;
+
+        $total_sale = $sum_products - $sum_paid;
+        $total_sale = $total_sale >= 0 ? $total_sale : 0;
 
         // Rebalacear valores das pacerlas
         foreach ($not_paid_list as $not_paid) {
