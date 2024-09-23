@@ -5,15 +5,20 @@ namespace App\Http\Controllers;
 use App\Models\List_Products_Sales;
 use App\Models\Method_Payment_Sales;
 use App\Models\Sales;
-use Exception;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 
 class Vendas extends Controller
 {
     public function view_list(Request $request): View
+    {
+        return view('Sale\List', json_decode($this->get_list($request)->getContent(), true));
+    }
+
+    public function get_list(Request $request): JsonResponse
     {
         $validate = $this->validate($request, [
             'search' => 'string',
@@ -57,17 +62,17 @@ class Vendas extends Controller
 
         $sales = $sales->paginate(page: $validate['page'] ?? 1, perPage: $validate['per_page'] ?? 10);
 
-        return view('Sale\List', compact("sales"));
+        return response()->json(compact("sales"));
     }
 
     public function create(Request $request): JsonResponse
     {
         $validate = $this->validate($request, [
             'client_id' => 'integer|exists:clients,id|required',
-            'total_price' => 'decimal:2|required',
         ]);
 
-        $validate['salesman_id'] = 1;
+        $validate['salesman_id'] = Auth::user()['id'];
+        $validate['total_price'] = 0;
 
         $sale = Sales::create($validate);
 
@@ -77,7 +82,12 @@ class Vendas extends Controller
 
         try {
             $this->create_list_products($request);
-            $this->create_method_payment($request);
+            $payment = $this->create_method_payment($request);
+
+            if ($payment->getStatusCode() !== 201) {
+                $response = json_decode($payment->getContent(), true);
+                $code = $payment->getStatusCode();
+            }
         } catch (HttpResponseException $e) {
             $this->delete($sale['id']);
             $erro_response = $e->getResponse();
@@ -109,8 +119,9 @@ class Vendas extends Controller
             ]);
         }, $validate['products']);
 
-
         List_Products_Sales::insert($products);
+
+        Sales::where('id', '=', $sale_id)->update(['total_price' => array_sum(array_column($validate['products'], 'total'))]);
 
         return response()->json(['message' => 'products add list sale'], 201);
     }
@@ -127,18 +138,25 @@ class Vendas extends Controller
         ]);
 
         $sale_id = $validate['sale_id'];
+        $sum_products = List_Products_Sales::selectRaw('SUM(total) as total')->where([['sale_id', '=', $sale_id]])->first()['total'] ?? 0;
+        $sum_payment = array_sum(array_column($validate['payment'], 'value'));
+        if ($sum_products >= 0 && $sum_payment == $sum_products) {
+            $payment = array_map(function ($payment) use ($sale_id) {
+                return array_merge($payment, [
+                    'sale_id' => $sale_id,
+                    'created_at' => date('Y-m-d H:i:s'),
+                    'updated_at' => date('Y-m-d H:i:s')
+                ]);
+            }, $validate['payment']);
 
-        $payment = array_map(function ($payment) use ($sale_id) {
-            return array_merge($payment, [
-                'sale_id' => $sale_id,
-                'created_at' => date('Y-m-d H:i:s'),
-                'updated_at' => date('Y-m-d H:i:s')
-            ]);
-        }, $validate['payment']);
+            Method_Payment_Sales::insert($payment);
 
-        Method_Payment_Sales::insert($payment);
-
-        return response()->json(['message' => 'created payment'], 201);
+            return response()->json(['message' => 'created payment'], 201);
+        } elseif ($sum_products == 0) {
+            return response()->json(['erro' => 'product', 'message' => 'not registred product list'], 400);
+        } elseif ($sum_payment !== $sum_products) {
+            return response()->json(['erro' => 'payment', 'message' => 'payment not equal product list'], 400);
+        }
     }
 
     public function sale(int $id): JsonResponse
@@ -226,6 +244,7 @@ class Vendas extends Controller
 
         if ($sale !== null) {
             $sale->delete();
+
             return response()->json(['message' => 'sale deleted'], 200);
         } else {
             return response()->json(['erro' => 'sale', 'message' => 'sale not found'], 404);
@@ -237,6 +256,11 @@ class Vendas extends Controller
         $product = List_Products_Sales::where([['id', '=', $list_id], ['sale_id', '=', $id]])->first();
         if ($product !== null) {
             $product->delete();
+
+            $this->rebalancing_parcels($id);
+            $sum_products = List_Products_Sales::selectRaw('SUM(total) as total')->where([['sale_id', '=', $id]])->get()['total'] ?? 0;
+            Sales::where('id', '=', $id)->first()->update(['total_price' => $sum_products]);
+
             return response()->json(['message' => 'product deleted'], 200);
         } else {
             return response()->json(['erro' => 'sale', 'message' => 'product not found'], 404);
@@ -245,13 +269,33 @@ class Vendas extends Controller
 
     public function delete_payment(int $id, int $payment_id): JsonResponse
     {
-        $payment = Method_Payment_Sales::where([['paid', '=', 0], ['id', '=', $payment_id], ['sale_id', '=', $id]])->first();
+        $payment = Method_Payment_Sales::where([['id', '=', $payment_id], ['sale_id', '=', $id]])->first();
 
-        if ($payment !== null) {
+        if ($payment !== null && $payment['paid'] == false) {
             $payment->delete();
+
+            $this->rebalancing_parcels($id);
+
             return response()->json(['message' => 'payment deleted'], 200);
+        } elseif ($payment !== null && $payment['paid'] == true) {
+            return response()->json(['erro' => 'sale', 'message' => 'payment is paid'], 404);
         } else {
             return response()->json(['erro' => 'sale', 'message' => 'payment not found'], 404);
+        }
+    }
+
+    private function rebalancing_parcels(int $sale_id)
+    {
+        $sale = Sales::where('id', '=', $sale_id)->first();
+
+        // Pegar os não pagos e a soma dos pagos
+        $not_paid_list = Method_Payment_Sales::select('id', 'value')->where([['sale_id', '=', $sale_id], ['paid', '=', 0]])->get()->toArray();
+        $sum_paid = Method_Payment_Sales::selectRaw('SUM(value) as value')->where([['sale_id', '=', $sale_id], ['paid', '=', 1]])->first()['value'] ?? 0;
+        $total_sale = $sale['total_price'] - $sum_paid;
+
+        // Rebalacear valores das pacerlas
+        foreach ($not_paid_list as $not_paid) {
+            Method_Payment_Sales::where('id', '=', $not_paid['id'])->update(['value' => ((($not_paid['value'] * 100) / $sale['total_price']) * $total_sale)]);
         }
     }
 }

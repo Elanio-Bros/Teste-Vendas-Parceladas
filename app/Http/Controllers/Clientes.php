@@ -11,10 +11,14 @@ class Clientes extends Controller
 {
     public function view_list(Request $request): View
     {
-        $validate = $this->validate($request, ['per_page' => 'integer', 'page' => 'integer']);
+        return view('Client\List', json_decode($this->get_list($request)->getContent(), true));
+    }
 
+    public function get_list(Request $request): JsonResponse
+    {
+        $validate = $this->validate($request, ['per_page' => 'integer', 'page' => 'integer']);
         $clients = Clients::paginate(page: $validate['page'] ?? 1, perPage: $validate['per_page'] ?? 10);
-        return view('Client\List', compact("clients"));
+        return response()->json(compact("clients"));
     }
 
     public function create(Request $request): JsonResponse

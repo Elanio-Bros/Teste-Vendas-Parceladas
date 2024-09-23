@@ -1,6 +1,6 @@
-@extends('base')
+@extends('Base\app')
 @section('title')
-    Login
+    Logout
 @endsection
 
 @section('body')

@@ -11,15 +11,14 @@ class Produtos extends Controller
 {
     public function view_list(Request $request): View
     {
-        $validate = $this->validate($request, ['per_page' => 'integer', 'page' => 'integer']);
-
-        $products = Products::paginate(page: $validate['page'] ?? 1, perPage: $validate['per_page'] ?? 10);
-        return view('Product\List', compact("products"));
+        return view('Product\List', json_decode($this->get_list($request)->getContent(), true));
     }
 
-    public function view_create(): View
+    public function get_list(Request $request): JsonResponse
     {
-        return view('Product\Create');
+        $validate = $this->validate($request, ['per_page' => 'integer', 'page' => 'integer']);
+        $products = Products::orderBy('id')->paginate(page: $validate['page'] ?? 1, perPage: $validate['per_page'] ?? 10)->toArray();
+        return response()->json(compact("products"));
     }
 
     public function create(Request $request): JsonResponse

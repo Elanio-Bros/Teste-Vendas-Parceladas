@@ -2,6 +2,7 @@
 
 namespace Tests\Feature;
 
+use App\Models\Admins;
 use App\Models\Products;
 use Tests\TestCase;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
@@ -11,7 +12,8 @@ class ProductTest extends TestCase
     use DatabaseTransactions;
     public function test_create(): void
     {
-        $response = $this->post('/produtos/produto/adicionar', ['name' => 'Camisa Polo', 'stock_quantity' => rand(1, 50), 'unity_price' => number_format((rand(200, 900) / 10), 2, thousands_separator: "")]);
+        $admin = Admins::factory()->create();
+        $response = $this->actingAs($admin)->post('/produtos/produto/adicionar', ['name' => 'Camisa Polo', 'stock_quantity' => rand(1, 50), 'unity_price' => number_format((rand(200, 900) / 10), 2, thousands_separator: "")]);
         $response->assertStatus(201)->assertJson(['message' => 'product created']);
     }
 
@@ -21,7 +23,8 @@ class ProductTest extends TestCase
 
         $product = Products::first();
 
-        $response = $this->post("/produtos/produto/{$product['id']}/editar", ['name' => 'Camisa Polo M', 'unity_price' => number_format((rand(200, 900) / 10), 2, thousands_separator: "")]);
+        $admin = Admins::factory()->create();
+        $response = $this->actingAs($admin)->post("/produtos/produto/{$product['id']}/editar", ['name' => 'Camisa Polo M', 'unity_price' => number_format((rand(200, 900) / 10), 2, thousands_separator: "")]);
 
         $response->assertStatus(200)->assertJson(['message' => 'product changed']);
     }
@@ -32,7 +35,8 @@ class ProductTest extends TestCase
 
         $product = Products::first();
 
-        $response = $this->post("/produtos/produto/{$product['id']}/apagar");
+        $admin = Admins::factory()->create();
+        $response = $this->actingAs($admin)->post("/produtos/produto/{$product['id']}/apagar");
         $response->assertStatus(200)->assertJson(['message' => 'product deleted']);
     }
 }
